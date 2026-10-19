@@ -70,9 +70,9 @@ private final class AccessibilityWindow: @unchecked Sendable {
     func minimized() throws -> Bool {
         var value: CFTypeRef?
         try check(AXUIElementCopyAttributeValue(window, kAXMinimizedAttribute as CFString, &value),
-                  operation: "读取最小化状态")
+                  operation: L10n.text("Read minimized state"))
         guard let minimized = value as? Bool else {
-            throw AccessibilityFailure(message: "目标窗口状态不可用，请重新选择窗口。")
+            throw AccessibilityFailure(message: L10n.text("The target window state is unavailable. Please choose a window again."))
         }
         return minimized
     }
@@ -80,13 +80,13 @@ private final class AccessibilityWindow: @unchecked Sendable {
     func setMinimized(_ minimized: Bool) throws {
         try check(AXUIElementSetAttributeValue(window, kAXMinimizedAttribute as CFString,
                                               minimized ? kCFBooleanTrue : kCFBooleanFalse),
-                  operation: minimized ? "最小化窗口" : "恢复窗口")
+                  operation: minimized ? L10n.text("Minimize window") : L10n.text("Restore window"))
     }
 
     func check(_ result: AXError, operation: String) throws {
         guard result != .success else { return }
         NSLog("窗口控制失败 pid=%d window=%@ operation=%@ AXError=%d", pid, title, operation, result.rawValue)
-        throw AccessibilityFailure(message: "\(operation)失败（\(result)）。请确认窗口仍存在且支持此操作，或重新授权辅助功能。")
+        throw AccessibilityFailure(message: L10n.format("%@ failed (%@). Check that the window still exists and supports this action, or grant Accessibility access again.", operation, String(describing: result)))
     }
 }
 
@@ -125,7 +125,7 @@ final class WindowAttachment {
                 !$0.isTerminated && $0.activationPolicy == .regular
                     && $0.processIdentifier != ProcessInfo.processInfo.processIdentifier
             }
-            .map { ApplicationCandidate(pid: $0.processIdentifier, name: $0.localizedName ?? "应用") }
+            .map { ApplicationCandidate(pid: $0.processIdentifier, name: $0.localizedName ?? L10n.text("App")) }
             .sorted { $0.name < $1.name }
         let handles = await withTaskGroup(of: [AccessibilityWindow].self) { group in
             var results: [AccessibilityWindow] = []
@@ -176,7 +176,7 @@ final class WindowAttachment {
                 break
             }
             AXUIElementSetMessagingTimeout(window, AccessibilitySettings.listingTimeout)
-            let title = AccessibilityWindow.attribute(window, kAXTitleAttribute) as? String ?? "未命名窗口"
+            let title = AccessibilityWindow.attribute(window, kAXTitleAttribute) as? String ?? L10n.text("Untitled Window")
             // 列表只读取标题；几何和最小化状态在选定窗口后读取。
             handles.append(AccessibilityWindow(window: window, appElement: AXUIElementCreateApplication(candidate.pid),
                                                pid: candidate.pid, title: title))
@@ -186,7 +186,7 @@ final class WindowAttachment {
 
     private func validate() throws {
         guard !application.isTerminated, AXIsProcessTrusted() else {
-            throw AccessibilityFailure(message: "目标应用已退出或辅助功能权限不可用，请重新选择窗口。")
+            throw AccessibilityFailure(message: L10n.text("The target app has quit or Accessibility access is unavailable. Please choose a window again."))
         }
     }
 
@@ -221,7 +221,7 @@ final class WindowAttachment {
             try validate()
             NSLog("应用恢复状态未确认 pid=%d window=%@ hidden=%d active=%d",
                   application.processIdentifier, title, application.isHidden, application.isActive)
-            throw AccessibilityFailure(message: "已尝试恢复应用，但尚未确认它显示在前台，请稍后重试。")
+            throw AccessibilityFailure(message: L10n.text("The app could not be confirmed in the foreground after restoring it. Please try again shortly."))
         }
         let result = try await WindowRaiseRecovery.perform(raise: { [handle] in
             try await handle.perform { handle in
@@ -242,7 +242,7 @@ final class WindowAttachment {
             return self.isForeground && AXIsProcessTrusted() && ready == true
         })
         try await handle.perform { handle in
-            try handle.check(result, operation: "恢复后将窗口移到前台")
+            try handle.check(result, operation: L10n.text("Bring restored window to front"))
         }
     }
 
@@ -250,14 +250,14 @@ final class WindowAttachment {
         try Task.checkCancellation()
         try validate()
         guard let url = application.bundleURL else {
-            throw AccessibilityFailure(message: "无法获取目标应用位置，请重新选择窗口。")
+            throw AccessibilityFailure(message: L10n.text("The target app location is unavailable. Please choose a window again."))
         }
         let instances = NSWorkspace.shared.runningApplications.filter {
             !$0.isTerminated && $0.bundleURL == url
         }
         guard instances.count == AccessibilitySettings.singleRunningInstanceCount,
               instances.first?.processIdentifier == application.processIdentifier else {
-            throw AccessibilityFailure(message: "目标应用有多个运行实例，无法安全选择恢复对象，请从 Dock 恢复后重新附着。")
+            throw AccessibilityFailure(message: L10n.text("Multiple instances of the target app are running. Restore it from the Dock, then attach again."))
         }
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
@@ -274,7 +274,7 @@ final class WindowAttachment {
         }
         try Task.checkCancellation()
         guard opened.processIdentifier == application.processIdentifier, !application.isTerminated else {
-            throw AccessibilityFailure(message: "目标应用进程已变化，请重新选择附着窗口。")
+            throw AccessibilityFailure(message: L10n.text("The target app process has changed. Please choose a window again."))
         }
     }
 
@@ -305,13 +305,13 @@ final class WindowAttachment {
                 try validate()
                 try await handle.perform { handle in
                     try handle.check(AXUIElementSetAttributeValue(handle.appElement, kAXHiddenAttribute as CFString, kCFBooleanTrue),
-                                     operation: "通过辅助功能隐藏应用")
+                                     operation: L10n.text("Hide app using Accessibility"))
                 }
             })
             guard hidden else {
                 NSLog("应用隐藏状态未确认 pid=%d window=%@ hidden=%d active=%d terminated=%d",
                       application.processIdentifier, title, application.isHidden, application.isActive, application.isTerminated)
-                throw AccessibilityFailure(message: "隐藏请求未生效或目标应用已退出，请稍后重试或重新选择窗口。")
+                throw AccessibilityFailure(message: L10n.text("The app could not be hidden or has quit. Please try again or choose a window again."))
             }
         }
     }

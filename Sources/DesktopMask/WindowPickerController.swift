@@ -9,9 +9,9 @@ private enum PickerLayout {
 @MainActor
 final class WindowPickerController: NSWindowController, NSWindowDelegate {
     private let picker = NSPopUpButton()
-    private let message = NSTextField(labelWithString: "正在读取窗口列表…")
-    private let confirm = NSButton(title: "附着", target: nil, action: nil)
-    private let refresh = NSButton(title: "刷新列表", target: nil, action: nil)
+    private let message = NSTextField(labelWithString: L10n.text("Loading windows…"))
+    private let confirm = NSButton(title: L10n.text("Attach"), target: nil, action: nil)
+    private let refresh = NSButton(title: L10n.text("Refresh List"), target: nil, action: nil)
     private var windows: [WindowAttachment] = []
     private var loadTask: Task<Void, Never>?
     private let onSelect: (WindowAttachment) -> Void
@@ -23,7 +23,7 @@ final class WindowPickerController: NSWindowController, NSWindowDelegate {
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: PickerLayout.size),
                               styleMask: [.titled, .closable], backing: .buffered, defer: false)
         super.init(window: window)
-        window.title = "选择附着窗口"
+        window.title = L10n.text("Choose a Window")
         window.isReleasedWhenClosed = false
         window.delegate = self
         window.center()
@@ -32,7 +32,7 @@ final class WindowPickerController: NSWindowController, NSWindowDelegate {
         confirm.keyEquivalent = "\r"
         refresh.target = self
         refresh.action = #selector(loadWindows)
-        let cancel = NSButton(title: "取消", target: self, action: #selector(cancelSelection))
+        let cancel = NSButton(title: L10n.text("Cancel"), target: self, action: #selector(cancelSelection))
         cancel.keyEquivalent = "\u{1b}"
         let buttons = NSStackView(views: [refresh, cancel, confirm])
         buttons.spacing = PickerLayout.spacing
@@ -63,7 +63,7 @@ final class WindowPickerController: NSWindowController, NSWindowDelegate {
 
     @objc private func loadWindows() {
         loadTask?.cancel()
-        message.stringValue = "正在读取窗口列表…（可以取消）"
+        message.stringValue = L10n.text("Loading windows… (you can cancel)")
         confirm.isEnabled = false
         picker.isEnabled = false
         refresh.isEnabled = false
@@ -74,7 +74,7 @@ final class WindowPickerController: NSWindowController, NSWindowDelegate {
             self.picker.removeAllItems()
             for window in windows {
                 self.picker.menu?.addItem(NSMenuItem(
-                    title: "\(window.application.localizedName ?? "应用") · \(window.title)", action: nil, keyEquivalent: ""
+                    title: "\(window.application.localizedName ?? L10n.text("App")) · \(window.title)", action: nil, keyEquivalent: ""
                 ))
             }
             if !windows.isEmpty { self.picker.selectItem(at: windows.startIndex) }
@@ -82,8 +82,8 @@ final class WindowPickerController: NSWindowController, NSWindowDelegate {
             self.picker.isEnabled = !windows.isEmpty
             self.refresh.isEnabled = true
             self.message.stringValue = windows.isEmpty
-                ? "暂无可用窗口，请打开目标应用后刷新。"
-                : "请选择目标窗口，附着后会激活该窗口。"
+                ? L10n.text("No windows available. Open the target app and refresh.")
+                : L10n.text("Choose a window. Attaching will bring it to the front.")
         }
     }
 

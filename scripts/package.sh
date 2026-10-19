@@ -22,8 +22,9 @@ output_directory="$project_root/dist"
 staging_directory="$(mktemp -d)"
 trap 'rm -rf "$staging_directory"' EXIT
 app_bundle="$staging_directory/$app_name.app"
-mkdir -p "$app_bundle/Contents/MacOS" "$output_directory"
+mkdir -p "$app_bundle/Contents/MacOS" "$app_bundle/Contents/Resources" "$output_directory"
 cp "$binary_directory/$app_name" "$app_bundle/Contents/MacOS/$app_name"
+cp -R "$binary_directory/DesktopMask_DesktopMask.bundle" "$app_bundle/Contents/Resources/"
 
 cat > "$app_bundle/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -35,6 +36,8 @@ cat > "$app_bundle/Contents/Info.plist" <<PLIST
     <key>CFBundleExecutable</key><string>$app_name</string>
     <key>CFBundleIdentifier</key><string>io.github.hibiki-ovo.SlackHarder</string>
     <key>CFBundlePackageType</key><string>APPL</string>
+    <key>CFBundleDevelopmentRegion</key><string>en</string>
+    <key>CFBundleLocalizations</key><array><string>en</string><string>zh-Hans</string></array>
     <key>CFBundleShortVersionString</key><string>$version</string>
     <key>CFBundleVersion</key><string>$version</string>
     <key>LSMinimumSystemVersion</key><string>13.0</string>

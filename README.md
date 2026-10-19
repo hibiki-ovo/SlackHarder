@@ -10,7 +10,7 @@ Download `SlackHarder-<version>-macOS-universal.zip` from [GitHub Releases](http
 
 The free distribution uses ad hoc signing and is not notarized by Apple. If macOS blocks the app, verify the download source, then go to **System Settings → Privacy & Security → Open Anyway**. Managed devices may restrict this option. Grant SlackHarder access under **Privacy & Security → Accessibility** on first launch. If access stops working after an update, remove the old permission entry and add the app again.
 
-Use the fish icon in the menu bar to control the app. No Dock icon is shown. The app currently uses Chinese interface labels; the descriptions below include the relevant labels.
+Use the fish icon in the menu bar to control the app. No Dock icon is shown. The interface supports English and Simplified Chinese and follows your macOS language preference, with English as the fallback. You can set an app-specific language under **System Settings → General → Language & Region → Applications**, then restart SlackHarder.
 
 ## Run from source
 
@@ -20,26 +20,26 @@ cd SlackHarder
 swift run SlackHarder
 ```
 
-Switch modes from the fish icon in the menu bar. The app starts in automatic mode and shows the overlay after you select a target window.
+Switch between “Automatic Mode” and “Manual Mode” from the fish icon in the menu bar. The app starts in “Automatic Mode” and shows the overlay after you select a target window.
 
 ## Opacity
 
-Adjust the “遮罩不透明度” (overlay opacity) slider from 0% to 100%. The setting is saved automatically and shared by both modes. By default, clicks pass through the overlay to the app beneath it.
+Adjust the “Overlay Opacity” slider from 0% to 100%. The setting is saved automatically and shared by both modes. By default, clicks pass through the overlay to the app beneath it.
 
 ## Manual mode
 
-- Toggle visibility with “显示遮罩 / 隐藏遮罩” (show / hide overlay).
-- Enable “编辑遮罩（移动 / 缩放）” (edit overlay) to drag the title bar or resize the edges. Click-through resumes when editing ends.
-- Position and size are saved automatically. Use “将遮罩移回当前屏幕” (move overlay to the current screen) to recover an off-screen overlay.
+- Toggle visibility with “Show Overlay / Hide Overlay”.
+- Enable “Edit Overlay (Move / Resize)” to drag the title bar or resize the edges. Click-through resumes when editing ends.
+- Position and size are saved automatically. Use “Move Overlay to Current Screen” to recover an off-screen overlay.
 
 ## Automatic mode
 
-- Select a target window and click “附着” (attach). The overlay follows the window as it moves and resizes. Click the attached-window menu item to choose another target.
+- Select a target window and click “Attach”. The overlay follows the window as it moves and resizes. Click the attached-window menu item to choose another target.
 - The overlay hides when you switch to another window, hide the app, or minimize the window. It reappears when you return to the target window.
-- Use either mouse side button (forward or back), or “鼠标侧键：隐藏 / 恢复” (mouse side button: hide / restore), to hide or restore all windows of the target app.
-- Choose “解除附着” (detach) to stop following the window, or switch to manual mode to restore your manual layout. Select a target again after restarting.
+- Use either mouse side button (forward or back), or “Mouse Side Button: Hide / Restore”, to hide or restore all windows of the target app.
+- Choose “Detach” to stop following the window, or switch to manual mode to restore your manual layout. Select a target again after restarting.
 
-Accessibility permission is required on first use (see installation instructions). Click “刷新列表” (refresh list) if the window list is out of date.
+Accessibility permission is required on first use (see installation instructions). Click “Refresh List” if the window list is out of date.
 
 Mouse side buttons may also trigger browser navigation. If your mouse driver maps them to keyboard shortcuts, switch them back to standard side buttons. Some games, custom-drawn windows, and full-screen setups may not be compatible.
 

@@ -92,7 +92,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             backing: .buffered,
             defer: false
         )
-        panel.title = "遮罩 · 拖动标题栏移动，拖动边缘缩放"
+        panel.title = L10n.text("Overlay · Drag the title bar to move, drag edges to resize")
         panel.contentMinSize = MaskSettings.minimumSize
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
@@ -104,30 +104,30 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
-            let fish = NSImage(systemSymbolName: "fish.fill", accessibilityDescription: "遮罩控制")
+            let fish = NSImage(systemSymbolName: "fish.fill", accessibilityDescription: L10n.text("Overlay Controls"))
             fish?.isTemplate = true
             button.image = fish
             button.title = fish == nil ? "🐟" : ""
-            button.toolTip = "遮罩控制"
-            button.setAccessibilityLabel("遮罩控制")
+            button.toolTip = L10n.text("Overlay Controls")
+            button.setAccessibilityLabel(L10n.text("Overlay Controls"))
         }
         let menu = NSMenu()
-        automaticItem = addItem("自动模式", action: #selector(selectAutomatic), to: menu)
-        manualItem = addItem("手动模式", action: #selector(selectManual), to: menu)
+        automaticItem = addItem(L10n.text("Automatic Mode"), action: #selector(selectAutomatic), to: menu)
+        manualItem = addItem(L10n.text("Manual Mode"), action: #selector(selectManual), to: menu)
         menu.addItem(.separator())
-        visibilityItem = addItem("隐藏遮罩", action: #selector(toggleManualVisibility), to: menu)
-        editItem = addItem("编辑遮罩（移动 / 缩放）", action: #selector(toggleEditing), to: menu)
-        mouseSideButtonItem = addItem("鼠标侧键：隐藏", action: #selector(toggleAttachedApplication), to: menu)
+        visibilityItem = addItem(L10n.text("Hide Overlay"), action: #selector(toggleManualVisibility), to: menu)
+        editItem = addItem(L10n.text("Edit Overlay (Move / Resize)"), action: #selector(toggleEditing), to: menu)
+        mouseSideButtonItem = addItem(L10n.text("Mouse Side Button: Hide"), action: #selector(toggleAttachedApplication), to: menu)
         menu.addItem(.separator())
-        attachmentItem = addItem("附着当前应用窗口", action: #selector(chooseAttachmentWindow), to: menu)
-        detachItem = addItem("解除附着", action: #selector(detachWindow), to: menu)
+        attachmentItem = addItem(L10n.text("Attach to an App Window"), action: #selector(chooseAttachmentWindow), to: menu)
+        detachItem = addItem(L10n.text("Detach"), action: #selector(detachWindow), to: menu)
         detachItem.isEnabled = false
-        addItem("授权辅助功能…", action: #selector(requestAccessibility), to: menu)
+        addItem(L10n.text("Grant Accessibility Access…"), action: #selector(requestAccessibility), to: menu)
         menu.addItem(.separator())
         addOpacitySlider(to: menu)
         menu.addItem(.separator())
-        recenterItem = addItem("将遮罩移回当前屏幕", action: #selector(recenter), to: menu)
-        addItem("退出", action: #selector(quit), to: menu)
+        recenterItem = addItem(L10n.text("Move Overlay to Current Screen"), action: #selector(recenter), to: menu)
+        addItem(L10n.text("Quit"), action: #selector(quit), to: menu)
         statusItem.menu = menu
         applyAppearance()
         updateModeMenu()
@@ -162,7 +162,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
                              width: controlWidth, height: MaskSettings.sliderHeight)
         slider.isContinuous = true
         opacitySlider = slider
-        slider.setAccessibilityLabel("遮罩不透明度")
+        slider.setAccessibilityLabel(L10n.text("Overlay Opacity"))
         view.addSubview(opacityLabel)
         view.addSubview(slider)
         let item = NSMenuItem()
@@ -180,7 +180,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
 
     private func applyAppearance() {
         panel.backgroundColor = NSColor.black.withAlphaComponent(CGFloat(opacity))
-        opacityLabel.stringValue = "遮罩不透明度：\(Int((opacity * MaskSettings.percentScale).rounded()))%"
+        opacityLabel.stringValue = L10n.format("Overlay Opacity: %@%%", String(Int((opacity * MaskSettings.percentScale).rounded())))
         opacitySlider.doubleValue = opacity
         panel.ignoresMouseEvents = interactionMode == .passthrough
         editItem.state = interactionMode == .editing ? .on : .off
@@ -247,18 +247,18 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         automaticItem.state = automatic ? .on : .off
         manualItem.state = automatic ? .off : .on
         visibilityItem.isHidden = automatic
-        visibilityItem.title = state.manualVisible ? "隐藏遮罩" : "显示遮罩"
+        visibilityItem.title = state.manualVisible ? L10n.text("Hide Overlay") : L10n.text("Show Overlay")
         editItem.isHidden = automatic
         recenterItem.isHidden = automatic
         attachmentItem.isHidden = !automatic
         detachItem.isHidden = !automatic
         detachItem.isEnabled = attachment != nil
         mouseSideButtonItem.isHidden = !automatic
-        mouseSideButtonItem.title = attachment?.application.isHidden == true ? "鼠标侧键：恢复" : "鼠标侧键：隐藏"
+        mouseSideButtonItem.title = attachment?.application.isHidden == true ? L10n.text("Mouse Side Button: Restore") : L10n.text("Mouse Side Button: Hide")
         mouseSideButtonItem.isEnabled = state.canControlWindow(hasAttachment: attachment != nil) && controlTask == nil
         attachmentItem.title = attachment.map {
-            "已附着：\($0.application.localizedName ?? "应用") · \($0.title)（点击重新选择）"
-        } ?? "选择附着窗口…"
+            L10n.format("Attached: %@ · %@ (click to change)", $0.application.localizedName ?? L10n.text("App"), $0.title)
+        } ?? L10n.text("Choose a Window…")
     }
 
     @objc private func toggleAttachedApplication() {
@@ -272,7 +272,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             } catch {
                 guard !Task.isCancelled, let self, self.attachment === attachment else { return }
                 let alert = NSAlert()
-                alert.messageText = "无法隐藏 / 恢复附着应用"
+                alert.messageText = L10n.text("Unable to Hide / Restore the Attached App")
                 alert.informativeText = error.localizedDescription
                 alert.runModal()
             }
@@ -346,7 +346,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         guard state.mode == .automatic else { return }
         guard AXIsProcessTrusted() else {
             requestAccessibility()
-            showAttachmentError("请在系统设置中允许辅助功能权限，然后重新选择自动模式或选择附着窗口。必要时重启程序。")
+            showAttachmentError(L10n.text("Allow Accessibility access in System Settings, then select Automatic Mode or choose a window again. Restart the app if needed."))
             return
         }
         if let windowPicker {
@@ -467,7 +467,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
 
     private func showAttachmentError(_ message: String) {
         let alert = NSAlert()
-        alert.messageText = "暂时无法附着窗口"
+        alert.messageText = L10n.text("Unable to Attach to the Window")
         alert.informativeText = message
         alert.runModal()
     }
