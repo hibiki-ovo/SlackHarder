@@ -1,16 +1,18 @@
 # SlackHarder
 
-macOS 原生桌面遮罩，使用 Swift + AppKit，无第三方依赖。需要 macOS 13 或更高版本；从源码构建另需 Swift 6 工具链。
+English | [简体中文](README.zh-CN.md)
 
-## 下载和安装
+A native macOS desktop overlay built with Swift and AppKit, with no third-party dependencies. Requires macOS 13 or later; building from source also requires a Swift 6 toolchain.
 
-从 [GitHub Releases](https://github.com/hibiki-ovo/SlackHarder/releases/latest) 下载 `SlackHarder-版本号-macOS-universal.zip`，支持 Apple Silicon 和 Intel Mac。解压后将 `SlackHarder.app` 拖入「应用程序」。
+## Download and install
 
-免费分发版本使用临时签名（ad hoc），未经过 Apple 公证。若系统阻止打开，请确认下载来源后，在「系统设置 → 隐私与安全性」点击「仍要打开」。受管理设备可能不允许此操作。首次运行请在「隐私与安全性 → 辅助功能」中授权 SlackHarder；更新后若权限失效，请移除旧授权并重新添加。
+Download `SlackHarder-<version>-macOS-universal.zip` from [GitHub Releases](https://github.com/hibiki-ovo/SlackHarder/releases/latest). It supports both Apple Silicon and Intel Macs. Extract the archive and drag `SlackHarder.app` into Applications.
 
-启动后通过菜单栏鱼形图标操作，不显示 Dock 图标。
+The free distribution uses ad hoc signing and is not notarized by Apple. If macOS blocks the app, verify the download source, then go to **System Settings → Privacy & Security → Open Anyway**. Managed devices may restrict this option. Grant SlackHarder access under **Privacy & Security → Accessibility** on first launch. If access stops working after an update, remove the old permission entry and add the app again.
 
-## 启动
+Use the fish icon in the menu bar to control the app. No Dock icon is shown. The app currently uses Chinese interface labels; the descriptions below include the relevant labels.
+
+## Run from source
 
 ```sh
 git clone https://github.com/hibiki-ovo/SlackHarder.git
@@ -18,52 +20,52 @@ cd SlackHarder
 swift run SlackHarder
 ```
 
-通过菜单栏鱼形图标切换模式。启动默认进入自动模式，选择目标窗口后显示遮罩。
+Switch modes from the fish icon in the menu bar. The app starts in automatic mode and shows the overlay after you select a target window.
 
-## 不透明度
+## Opacity
 
-通过「遮罩不透明度」滑块调节透明度（0%～100%），设置自动保存，两种模式共用。遮罩默认鼠标穿透，可操作下方应用。
+Adjust the “遮罩不透明度” (overlay opacity) slider from 0% to 100%. The setting is saved automatically and shared by both modes. By default, clicks pass through the overlay to the app beneath it.
 
-## 手动模式
+## Manual mode
 
-- 通过「显示遮罩 / 隐藏遮罩」控制显示。
-- 勾选「编辑遮罩（移动 / 缩放）」后，可拖动标题栏移动、拖动边缘调整大小；结束编辑后恢复鼠标穿透。
-- 位置和大小自动保存。「将遮罩移回当前屏幕」可找回移出屏幕的遮罩。
+- Toggle visibility with “显示遮罩 / 隐藏遮罩” (show / hide overlay).
+- Enable “编辑遮罩（移动 / 缩放）” (edit overlay) to drag the title bar or resize the edges. Click-through resumes when editing ends.
+- Position and size are saved automatically. Use “将遮罩移回当前屏幕” (move overlay to the current screen) to recover an off-screen overlay.
 
-## 自动模式
+## Automatic mode
 
-- 选择目标窗口并点击「附着」，遮罩会跟随窗口移动和缩放。点击已附着窗口菜单项可更换目标。
-- 切换到其他窗口、隐藏应用或最小化窗口时，遮罩自动隐藏；返回目标窗口后恢复。
-- 鼠标前进键、后退键或菜单「鼠标侧键：隐藏 / 恢复」可隐藏或恢复目标应用的全部窗口。
-- 「解除附着」停止跟随；切换手动模式则恢复手动布局。重启后需重新选择目标窗口。
+- Select a target window and click “附着” (attach). The overlay follows the window as it moves and resizes. Click the attached-window menu item to choose another target.
+- The overlay hides when you switch to another window, hide the app, or minimize the window. It reappears when you return to the target window.
+- Use either mouse side button (forward or back), or “鼠标侧键：隐藏 / 恢复” (mouse side button: hide / restore), to hide or restore all windows of the target app.
+- Choose “解除附着” (detach) to stop following the window, or switch to manual mode to restore your manual layout. Select a target again after restarting.
 
-首次使用需授予辅助功能权限（见安装说明）。窗口列表未更新时可点击「刷新列表」。
+Accessibility permission is required on first use (see installation instructions). Click “刷新列表” (refresh list) if the window list is out of date.
 
-鼠标侧键仍可能触发浏览器前进 / 后退；若鼠标驱动将侧键映射为快捷键，需改回标准侧键。部分游戏、自绘窗口及全屏场景可能不兼容。
+Mouse side buttons may also trigger browser navigation. If your mouse driver maps them to keyboard shortcuts, switch them back to standard side buttons. Some games, custom-drawn windows, and full-screen setups may not be compatible.
 
-## 构建和测试
+## Build and test
 
 ```sh
 swift build
 swift test
 ```
 
-可用 Xcode 打开 `Package.swift`。辅助功能授权、鼠标和窗口交互需本机验证。
+You can open `Package.swift` in Xcode. Accessibility permissions, mouse input, and window interactions require manual testing on a Mac.
 
-## 打包和发布
+## Package and publish
 
 ```sh
 bash scripts/package.sh 0.1.0
 ```
 
-生成 `dist/SlackHarder-0.1.0-macOS-universal.zip` 和 SHA-256 校验文件，包含双架构 `.app`。打包脚本使用本地临时签名，不需要开发者会员。
+This creates `dist/SlackHarder-0.1.0-macOS-universal.zip` and a SHA-256 checksum file. The archive contains a universal `.app` with an ad hoc signature; no paid developer membership is required.
 
-向 GitHub 推送 `v0.1.0` 格式的版本标签后，GitHub Actions 会运行测试、打包并发布 Release。后续版本使用新的版本号和标签。
+Pushing a version tag such as `v0.1.0` to GitHub triggers GitHub Actions to test, package, and publish a release. Use a new version number and tag for each subsequent release.
 
-已安装 GitHub CLI 并通过 `gh auth login` 登录具备仓库写入权限的账号后，也可以运行：
+With GitHub CLI installed and authenticated via `gh auth login` using an account with repository write access, you can also run:
 
 ```sh
 bash scripts/publish.sh 0.1.0
 ```
 
-脚本在临时目录克隆远程仓库，复制当前源码、提交并推送版本标签；保留远程历史，不执行强制推送。工作流需要仓库允许 GitHub Actions 运行。
+The script clones the remote repository into a temporary directory, copies the current source, commits it, and pushes a version tag. It preserves remote history and does not force-push. GitHub Actions must be enabled for the repository.
