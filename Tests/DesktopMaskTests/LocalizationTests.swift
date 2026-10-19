@@ -25,8 +25,7 @@ private func translations(_ language: String) throws -> [String: String] {
 
 @Test(arguments: ["en", "zh-Hans"])
 func translatedMenusAndDynamicLabels(_ language: String) throws {
-    let path = try #require(L10n.bundle.path(forResource: language, ofType: "lproj"))
-    let bundle = try #require(Bundle(path: path))
+    let bundle = try #require(L10n.localizedBundle(for: language))
     let mode = bundle.localizedString(forKey: "Automatic Mode", value: nil, table: nil)
     #expect(mode == (language == "en" ? "Automatic Mode" : "自动模式"))
     let format = bundle.localizedString(forKey: "Overlay Opacity: %@%%", value: nil, table: nil)
